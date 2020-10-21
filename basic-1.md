@@ -57,4 +57,37 @@ FALLBACK:
     * 行内元素不可以设置宽高，不独占一行
 * 块级元素：div ul ol li dl dt dd h1 h2... p
     * 块级元素可以设置宽高，独占一行
-* 空元素：\<br><hr><img><input><link><meta>
+* 空元素：```<br><hr><img><input><link><meta>```
+
+### 23.viewport
+```js
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    // width    设置viewport宽度，为一个正整数，或字符串‘device-width’
+    // device-width  设备宽度
+    // height   设置viewport高度，一般设置了宽度，会自动解析出高度，可以不用设置
+    // initial-scale    默认缩放比例（初始缩放比例），为一个数字，可以带小数
+    // minimum-scale    允许用户最小缩放比例，为一个数字，可以带小数
+    // maximum-scale    允许用户最大缩放比例，为一个数字，可以带小数
+    // user-scalable    是否允许手动缩放
+```
+* 延伸提问
+    * 怎样处理移动端1px被渲染成2px的问题
+        * 方案1：针对ios，使用`border:0.5px solid`
+        * 方案2：使用边框图片，`border-image:url(...) 2 repeat`
+        * 方案3：border-shadow:0 1px 1px 1px color
+        * 方案4：伪元素：
+            ```css
+            .setOnePx{
+                position:relative;
+                &::after{
+                    content:" ";
+                    position:absolute;
+                    display: block;
+                    top:0;
+                    left:0;
+                    width:100%;
+                    height:1px;
+                    transform:scale(1,0.5)
+                }
+            }
+            ```
