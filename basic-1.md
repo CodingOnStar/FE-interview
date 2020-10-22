@@ -91,3 +91,72 @@ FALLBACK:
                 }
             }
             ```
+### 24.渲染优化
+* 禁止使用iframe
+    * iframe会阻塞父文档onload事件
+    * 搜索引擎无法检索此种页面，不利于SEO
+    * iframe与主页面共享连接池，而浏览器对相同域的连接有限制，所以会影响页面的并行加载
+    * 如要使用，可以使用JS动态给src添加属性值，这样可以绕开以上两个问题。
+* 使用CSS3代码替换JS动画：**尽可能的避免重排重绘和回流**
+* 对于一些小图标，可以使用base64位编码，以减少网络请求
+    * 优势在于：
+        * 减少HTTP请求
+        * 避免文件跨域
+        * 修改及时生效
+* 页面头部的`<script><style>`标签会阻塞页面，因为Renderer进程中JS线程和渲染线程是互斥的
+* 空的**href**和**src**会阻塞页面其他资源的加载。
+* 使用innerHTML代替DOM操作，减少DOM操作次数，优化JS性能
+* 少用全局变量，缓存DOM节点查找的结果，减少IO读取操作
+* 图片预加载，脚本放底部加上时间戳，样式表放在顶部
+
+### 27.div+css的布局较于table布局有什么优点？
+* 改进的时候方便，只需要改css文件
+* 页面加载速度快，结构化清晰，页面显示简洁
+* 表现与结构分离
+* 易于优化(SEO)，搜索引擎更友好
+
+### 31.简述一下src和href的区别
+* **src**用于替换当前元素，**href**用于在当前文档和引用资源之间确立联系
+* **src**:
+>`<script src ="js.js"></script>`当浏览器解析到该元素时，会暂停其他资源的下载和处理,直到将该资源加载、编译、执行完毕，图片和框架等元素也如此，类似于将所指向资源嵌入当前标签内。**这也是为什么将js脚本放在底部而不是头部**
+* `href`是`Hypertext Reference`的缩写，指向网络资源所在位置，建立和当前元素（锚点）或当前文档（链接）之间的链接，如果我们在文档中添加`<link href="common.css" rel="stylesheet"/>`那么浏览器会识别该文档为css文件，就会并行下载资源并且不会停止对当前文档的处理。这也是为什么建议使用link方式来加载css，而不是使用@import方式
+**link与@import的区别：**
+
+<table><tr><td bgcolor=yellow>
+1）link是XHTML标签，无兼容问题；@import是在CSS2.1提出的，低版本的浏览器不支持。<br>
+2）link可以加载CSS，Javascript；@import只能加载CSS。<br>
+3）link加载的内容是与页面同时加载；@import需要页面网页完全载入以后加载。</td></tr></table>
+
+<!--<font color=#00ffff size=3 face="STCAIYUN">null</font>-->
+### 32.网页制作会用到的图片格式有哪些？
+* 需要关注的是**Webp**和**Apng**两种新格式
+* **Webp**：WebP格式，谷歌（google）开发的一种旨在加快图片加载速度的图片格式。图片压缩体积大约只有JPEG的2/3，并能节省大量的服务器带宽资源和数据空间。Facebook Ebay等知名网站已经开始测试并使用WebP格式。在质量相同的情况下，WebP格式图像的体积要比JPEG格式图像小40%。
+* **Apng**：全称是“Animated Portable Network Graphics”, 是PNG的位图动画扩展，可以实现png格式的动态图片效果。04年诞生，但一直得不到各大浏览器厂商的支持，直到日前得到 iOS safari 8的支持，有望代替GIF成为下一代动态图标准
+
+### 33.一个页面上有大量的图片，加载很慢，有哪些方法可以优化，给用户更好的体验？
+* **图片懒加载**，在页面上的未可视区域可以添加一个滚动事件，判断图片位置与浏览器顶端的距离与页面的距离，如果前者小于后者，优先加载。
+* 如果为幻灯片、相册等，可以使用图片预加载技术，将当前展示图片的前一张和后一张优先下载。
+* 如果图片为css图片，可以使用CSSsprite，SVGsprite，Iconfont、Base64等技术。
+* 如果图片过大，可以使用特殊编码的图片，加载时会先加载一张压缩的特别厉害的缩略图，以提高用户体验。
+* 如果图片展示区域小于图片的真实大小，则因在服务器端根据业务需要先行进行图片压缩，图片压缩后大小与展示一致。
+### 36.HTTP request报文结构是怎样的？
+1. 首行是**Request-Line**包括：**请求方法，请求URL，协议版本，CRLF**
+2. 首行之后是若干行**请求头**，包括**general-header，request-header或者entity-header**，每个一行以CRLF结束
+3. 请求头和消息实体之间有一个**CRLF分隔**
+4. 根据实际请求需要可能包含一个**消息实体** 一个请求报文例子如下：
+```HTTP
+GET /Protocols/rfc2616/rfc2616-sec5.html HTTP/1.1
+Host: www.w3.org
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36
+Referer: https://www.google.com.hk/
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: authorstyle=yes
+If-None-Match: "2cc8-3e3073913b100"
+If-Modified-Since: Wed, 01 Sep 2004 13:24:52 GMT
+
+name=qiu&age=25
+```
