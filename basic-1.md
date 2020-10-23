@@ -139,6 +139,7 @@ FALLBACK:
 * 如果图片为css图片，可以使用CSSsprite，SVGsprite，Iconfont、Base64等技术。
 * 如果图片过大，可以使用特殊编码的图片，加载时会先加载一张压缩的特别厉害的缩略图，以提高用户体验。
 * 如果图片展示区域小于图片的真实大小，则因在服务器端根据业务需要先行进行图片压缩，图片压缩后大小与展示一致。
+
 ### 36.HTTP request报文结构是怎样的？
 1. 首行是**Request-Line**包括：**请求方法，请求URL，协议版本，CRLF**
 2. 首行之后是若干行**请求头**，包括**general-header，request-header或者entity-header**，每个一行以CRLF结束
@@ -160,3 +161,29 @@ If-Modified-Since: Wed, 01 Sep 2004 13:24:52 GMT
 
 name=qiu&age=25
 ```
+
+### 37.HTTP response报文结构是怎样的
+* 首行是状态行包括：HTTP版本，状态码，状态描述，后面跟一个CRLF
+* 首行之后是若干行响应头，包括：通用头部，响应头部，实体头部
+* 响应头部和响应实体之间用一个CRLF空行分隔
+* 最后是一个可能的消息实体
+```HTTP
+HTTP/1.1 200 OK
+Date: Tue, 08 Jul 2014 05:28:43 GMT
+Server: Apache/2
+Last-Modified: Wed, 01 Sep 2004 13:24:52 GMT
+ETag: "40d7-3e3073913b100"
+Accept-Ranges: bytes
+Content-Length: 16599
+Cache-Control: max-age=21600
+Expires: Tue, 08 Jul 2014 11:28:43 GMT
+P3P: policyref="http://www.w3.org/2001/05/P3P/p3p.xml"
+Content-Type: text/html; charset=iso-8859-1
+
+{"name": "qiu", "age": 25}
+```
+
+### 39.谈谈Cookie的弊端
+* 每个特定的域名下最多生成20个cookie
+* 不用浏览器有不同数量cookie的限制
+* 如果cookie被拦截，就可以取得所有的session信息
