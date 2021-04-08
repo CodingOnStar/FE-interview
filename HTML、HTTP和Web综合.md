@@ -191,7 +191,9 @@ document.onclick(e){
 <table><tr><td bgcolor=yellow>
 1）link是XHTML标签，无兼容问题；@import是在CSS2.1提出的，低版本的浏览器不支持。<br>
 2）link可以加载CSS，Javascript；@import只能加载CSS。<br>
-3）link加载的内容是与页面同时加载；@import需要页面网页完全载入以后加载。</td></tr></table>
+3）link加载的内容是与页面同时加载；@import需要页面网页完全载入以后加载。<br>
+4）避免FOUC:Flash Of Unstyled Content用户定义样式表加载之前浏览器使用默认样式显示文档，用户样式加载渲染之后再从新显示文档，造成页面闪烁。----把样式表放到文档的head中
+</td></tr></table>
 
 <!--<font color=#00ffff size=3 face="STCAIYUN">null</font>-->
 ### 32.网页制作会用到的图片格式有哪些？
