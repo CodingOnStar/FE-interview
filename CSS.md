@@ -32,6 +32,8 @@
     * 触发了BFC的元素，不会和它的子元素折叠
     * 浮动流、inline-block和绝对定位的元素margin在垂直方向上不会折叠
     * 元素自身的margin-top和bottom相邻时，也会折叠
+### 86.设置元素浮动后，该元素的display值会如何改变
+* 设置元素浮动后，display会变成block
 ### 11.CSS盒子模型
 * 标准W3C盒模型：元素宽度=width+padding+border+margin(box-sizing:content-box)
 * 怪异IE盒模型：元素宽度= width+margin(box-sizing:border-box)
@@ -40,6 +42,13 @@
 
 ### 12. CSS优先级算法如何计算？
 * !important(Infinity)>行间样式(1000)>id(100)>class,属性,伪类(10)>tag,伪元素(1)>通配符*
+
+### 89.display:inline-block什么时候会显示间距
+* 相邻的inline-block元素之间有换行或者空格分隔的情况下会产生间距
+* 非inline-block水平元素设置为inline-block也会有水平间距
+* 可以借助vertical-align:top消除垂直间距
+* **在父级中加font-size:0，在子元素里设置需要的字体大小，消除垂直间距**
+* li标签写在同一行可以消除垂直间距，但代码可读性差
 
 ### 16.display:inline-block什么时候不会显示间隙？
 * 移除空格
@@ -125,3 +134,76 @@
 5. 避免使用CSS表达式，因为每次调用都会重新计算值
 6. 尽量使用CSS属性简写
 7. 批量修改元素样式
+
+### 58.居中一个div；居中一个浮动元素；居中一个绝对定位的div
+**居中一个div**
+```css
+.div{
+    width:200px;
+    margin:0 auto;
+}
+```
+**居中一个浮动元素**
+```css
+.div{
+    width:500px;
+    height:300px;
+    margin:-150px 0 0 -250px;
+    position:relative;
+    left:50%;
+    top:50%;
+}
+```
+**居中一个绝对定位div**
+```css
+.div{
+    position:absolute;
+    width:1200px;
+    margin: 0 auto;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+}
+```
+### 59.画一个三角形
+```css
+#demo{
+    width:0;
+    height:0;
+    border-width:20px;
+    border-style:solid;
+    border-color:transparent transparent red transparent;
+
+}
+```
+### 71.浏览器是怎样解析CSS选择器的
+* 从右到左
+
+### 75.元素竖向的百分比设定是相对于容器的高度吗
+* 元素竖向的百分比是相对容器的宽度，不是高度
+### 90.一个高度自适应的div，里面包含一个100px的div和一个填满剩下高度的div
+```css
+.sub{
+    height:calc(100% - 100px)
+}
+```
+```css
+.container{
+    position:relative;
+}
+.sub{
+    position:absolute;
+    top:100px;
+    bottom:0;
+    }
+```
+```css
+.contatiner{
+    display:flex;
+    flex-direction:column;
+}
+.sub{
+    flex:1;
+}
+```
