@@ -274,5 +274,241 @@ xhr.onreadystatechange = function() {
 ### 70. callee和caller有什么作用？
 * caller是返回一个函数的引用，该函数调用了当前函数
 * callee是返回正在被执行的function函数，即所指定的function对象的正文
-### 5.JavaScript如何实现继承
+### 80.项目做过哪些性能优化
+>减少 HTTP 请求数，减少 DNS 查询，使用 CDN，避免重定向，图片懒加载，减少 DOM 元素数量，减少DOM 操作，使用外部 JavaScript 和 CSS，压缩 JavaScript 、 CSS 、字体、图片等，优化 CSS Sprite，使用 iconfont，字体裁剪，多域名分发划分内容到不同域名，尽量减少 iframe 使用，避免图片 src 为空，把样式表放在link 中，把JavaScript放在页面底部，
 
+### 82 WebSocket
+>由于HTTP存在一个明显的缺陷，即消息只能从客户端推送到服务端，而使用轮询解决服务端连续变化的问题时，效率过低，因此使用WebSocket
+
+* 支持双向通信，实时性更强
+* 可以发送文本，也可以发送二进制文件
+* 较少的控制开销
+* 支持扩展
+* 无跨域问题
+### 84.深浅拷贝
+* 浅拷贝：Object.assign或者展开运算符
+* 深拷贝：
+```js
+//对于非symbol、funtion和undefined对象时，可以使用JSON.stringify()和JSON.parse进行深拷贝
+//其余情况
+function deepClone (obj) {
+    const targetObj = obj.constructor === Array ? [] : {}
+    for (let keys in obj) {
+        if (obj.hasOwnProperty(keys)) {
+            if (obj[keys] && typeof obj[keys] === "object") {
+                targetObj[keys] = obj[keys].constructor === Array ? [] : {}
+                targetObj[keys] = deepClone(obj[keys])
+            } else {
+                targetObj[keys] = obj[keys]
+            }
+        }
+    }
+    return targetObj
+}
+//数组方法slice和concat都只对第一层进行深拷贝
+//对象的...展开实现的是对象带第一层的深拷贝，后面的拷贝都是引用值
+```
+### 85.防抖/节流
+* 防抖
+>在滚动事件中需要做个复杂计算或者实现一个按钮的防二次点击操作。可以通过函数防抖动来实现
+
+**对于按钮防点击来说的实现：**
+* 开始一个定时器，只要定时器还在，不论如何点击按钮，都不会执行回调函数。一旦定时器结束并设置为null，就可以再次点击了
+
+**对于延时执行函数来说的数显：**
+* 每次调用防抖动函数都会判断本次调用和之前的时间间隔，如果小于需要的时间间隔，就会重新创建一个定时器，并且定时器的延时为设定时间减去之前的时间间隔。一旦时间到了，就会执行相应的回调函数
+```js
+function debounce(fn,delay) {
+    var timer;
+    return function() {
+        var _this=this,
+        var args = arguments;
+        if(timer){
+            clearTimeout(timer)
+        }else{
+            timer = setTimeout(function() {
+                fn.apply(_this,args)
+            },delay)
+        }
+    }
+}
+```
+```js
+// 使用 underscore 的源码来解释防抖动
+/**
+ * underscore 防抖函数，返回函数连续调用时，空闲时间必须大于或等于 wait，func 才会执行
+ *
+ * @param  {function} func        回调函数
+ * @param  {number}   wait        表示时间窗口的间隔
+ * @param  {boolean}  immediate   设置为ture时，是否立即调用函数
+ * @return {function}             返回客户调用函数
+ */
+_.debounce = function(func, wait, immediate) {
+    var timeout, args, context, timestamp, result;
+
+    var later = function() {
+      // 现在和上一次时间戳比较
+      var last = _.now() - timestamp;
+      // 如果当前间隔时间少于设定时间且大于0就重新设置定时器
+      if (last < wait && last >= 0) {
+        timeout = setTimeout(later, wait - last);
+      } else {
+        // 否则的话就是时间到了执行回调函数
+        timeout = null;
+        if (!immediate) {
+          result = func.apply(context, args);
+          if (!timeout) context = args = null;
+        }
+      }
+    };
+
+    return function() {
+      context = this;
+      args = arguments;
+      // 获得时间戳
+      timestamp = _.now();
+      // 如果定时器不存在且立即执行函数
+      var callNow = immediate && !timeout;
+      // 如果定时器不存在就创建一个
+      if (!timeout) timeout = setTimeout(later, wait);
+      if (callNow) {
+        // 如果需要立即执行函数的话 通过 apply 执行
+        result = func.apply(context, args);
+        context = args = null;
+      }
+
+      return result;
+    };
+  };
+```
+* 节流
+>二者本质不一样，防抖动是将多次执行变为一次执行，而节流是将多次执行变为每隔一段时间执行
+```js
+function throttle(fn,delay){
+    var timer;
+    return function() {
+        var _this = this;
+        var _args = arguments;
+        if(timer){
+            return
+        }else{
+            timer = setTimeout(function(){
+                fn.apply(_this,_args)
+                timer = null;
+            },delay);
+        }
+    }
+}
+function throttle2(func,delay){
+    var previous;
+    return function(){
+        var _this = this
+        var _args = arguments
+        var now = new Date()
+        if(now - previous > delay){
+            func.apply(_this,_args)
+            previous = now;
+        }
+    }
+}
+```
+```js
+/**
+ * underscore 节流函数，返回函数连续调用时，func 执行频率限定为 次 / wait
+ *
+ * @param  {function}   func      回调函数
+ * @param  {number}     wait      表示时间窗口的间隔
+ * @param  {object}     options   如果想忽略开始函数的的调用，传入{leading: false}。
+ *                                如果想忽略结尾函数的调用，传入{trailing: false}
+ *                                两者不能共存，否则函数不能执行
+ * @return {function}             返回客户调用函数   
+ */
+_.throttle = function(func, wait, options) {
+    var context, args, result;
+    var timeout = null;
+    // 之前的时间戳
+    var previous = 0;
+    // 如果 options 没传则设为空对象
+    if (!options) options = {};
+    // 定时器回调函数
+    var later = function() {
+      // 如果设置了 leading，就将 previous 设为 0
+      // 用于下面函数的第一个 if 判断
+      previous = options.leading === false ? 0 : _.now();
+      // 置空一是为了防止内存泄漏，二是为了下面的定时器判断
+      timeout = null;
+      result = func.apply(context, args);
+      if (!timeout) context = args = null;
+    };
+    return function() {
+      // 获得当前时间戳
+      var now = _.now();
+      // 首次进入前者肯定为 true
+	  // 如果需要第一次不执行函数
+	  // 就将上次时间戳设为当前的
+      // 这样在接下来计算 remaining 的值时会大于0
+      if (!previous && options.leading === false) previous = now;
+      // 计算剩余时间
+      var remaining = wait - (now - previous);
+      context = this;
+      args = arguments;
+      // 如果当前调用已经大于上次调用时间 + wait
+      // 或者用户手动调了时间
+ 	  // 如果设置了 trailing，只会进入这个条件
+	  // 如果没有设置 leading，那么第一次会进入这个条件
+	  // 还有一点，你可能会觉得开启了定时器那么应该不会进入这个 if 条件了
+	  // 其实还是会进入的，因为定时器的延时
+	  // 并不是准确的时间，很可能你设置了2秒
+	  // 但是他需要2.2秒才触发，这时候就会进入这个条件
+      if (remaining <= 0 || remaining > wait) {
+        // 如果存在定时器就清理掉否则会调用二次回调
+        if (timeout) {
+          clearTimeout(timeout);
+          timeout = null;
+        }
+        previous = now;
+        result = func.apply(context, args);
+        if (!timeout) context = args = null;
+      } else if (!timeout && options.trailing !== false) {
+        // 判断是否设置了定时器和 trailing
+	    // 没有的话就开启一个定时器
+        // 并且不能不能同时设置 leading 和 trailing
+        timeout = setTimeout(later, remaining);
+      }
+      return result;
+    };
+  };
+```
+### 87.什么是单线程，和异步的关系
+* 单线程：只有一个线程，只能做一件事
+* 原因：避免DOM渲染的冲突
+* 解决方案：异步
+### 93.请简单实现双向数据绑定
+```js
+const data = {}
+const input = document.getElementById('input')
+Object.defineProperty(data,'text',{
+    set(value){
+        this.value = value ;
+        input.value = value;
+    }
+});
+input.onChange = function(e){
+    data.text = e.target.value;
+}
+```
+### 94.实现Storage，使得该对象为单例，并对localStorage进行封装设置值SetItem(key,value)和getItem(key)
+```js
+var instance = null;
+class Storage {
+  static getInstance() {
+    if (!instance) {
+      instance = new Storage();
+    }
+    return instance;
+  }
+  setItem = (key, value) => localStorage.setItem(key, value),
+  getItem = key => localStorage.getItem(key)
+}
+```
+### 5.JavaScript如何实现继承
