@@ -110,6 +110,7 @@ function extend(Child, Parent) {
   　Child.uber = Parent.prototype;
 }
 ```
+* class语法糖：extends
 ### 7.事件模型
 W3C中定义事件的发生经历有三个阶段：捕获，目标阶段，冒泡
 * 冒泡型事件：子元素先触发，父级元素后触发(stopPropagation()方法进行阻止冒泡)
