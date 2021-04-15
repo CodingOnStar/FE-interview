@@ -90,6 +90,26 @@ var module1 = (function(){
 * 又称事件委托，即把原本需要绑定的事件委托给父元素，让父元素担当事件监听的职务。**原理是DOM元素的事件冒泡**。使用事件代理可以提高性能
     * 节省内存占用，减少事件注册（比如在table上代理所有td的click事件）
     * 可以实现当新增子元素时无需再次对其绑定
+### 5.JavaScript如何实现继承
+    * 构造函数绑定：使用call或apply将父对象的构造函数绑定在子对象上
+```js
+function Cat(name,color){
+ 　Animal.apply(this, arguments);
+ 　this.name = name;
+ 　this.color = color;
+}
+```
+* 拷贝继承
+* 原型继承（圣杯模式）
+```js
+function extend(Child, Parent) {
+    var F = function(){};
+  　F.prototype = Parent.prototype;
+  　Child.prototype = new F();
+  　Child.prototype.constructor = Child;
+  　Child.uber = Parent.prototype;
+}
+```
 ### 7.事件模型
 W3C中定义事件的发生经历有三个阶段：捕获，目标阶段，冒泡
 * 冒泡型事件：子元素先触发，父级元素后触发(stopPropagation()方法进行阻止冒泡)
@@ -511,4 +531,34 @@ class Storage {
   getItem = key => localStorage.getItem(key)
 }
 ```
-### 5.JavaScript如何实现继承
+### 95.说说event loop
+微任务与宏任务
+宏任务主要包含：script(整体代码)、setTimeout、setInterval、I/O、UI交互事件、setImmediate(Node.js 环境)
+
+微任务主要包含：Promise、MutaionObserver、process.nextTick(Node.js 环境)
+**所以正确的一次 Event loop 顺序是这样的**
+* 执行同步代码，这属于宏任务
+* 构造函数执行
+* 执行栈为空，查询是否有微任务
+* 执行所有微任务
+* 必要的话渲染UI
+* 开始下一轮Event loop
+```js
+console.log('script start');
+
+setTimeout(function () {
+    console.log('timeout1');
+},10);
+//Promise.resolve 方法允许调用时不带参数，直接返回一个resolved 状态的 Promise 对象。立即 resolved 的 Promise 对象，是在本轮“事件循环”（event loop）的结束时，而不是在下一轮“事件循环”的开始时。
+Promise.resolve().then(console.log('then2'))
+new Promise(resolve => {
+    console.log('promise1');
+    resolve();
+    setTimeout(() => console.log('timeout2'), 0);
+}).then(function () {
+    console.log('then1')
+})
+
+console.log('script end');
+//script start - then2 - promise1 - script end- then1  - timeout2 -timeout1
+```
