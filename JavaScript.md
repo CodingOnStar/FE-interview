@@ -237,6 +237,11 @@ xhr.onreadystatechange = function() {
     * 高并发（最重要的优点）
 * 缺点：
     * 不能充分利用CPU
+### 51.如何判断一个数据类型
+* instanceof
+* Constructor
+* Object.prototype.toString.call(value)
+* typeof
 ### 57.异步变成的实现方式
 * 回调函数
     * 优点：简单，容易理解
@@ -295,9 +300,34 @@ xhr.onreadystatechange = function() {
 ### 70. callee和caller有什么作用？
 * caller是返回一个函数的引用，该函数调用了当前函数
 * callee是返回正在被执行的function函数，即所指定的function对象的正文
+### 74.数组去重的方法
+* ES6的Set
+```js
+function unique (arr) {
+  return Array.from(new Set(arr))
+}
+//简化后
+[...new Set(arr)]
+```
+* 双层for循环，之后用splice去重
+* indexOf
+* 利用sort()
+* 利用对象属性不能相同的特点
+* includes
+* 利用filter，原数组中的第一个索引==当前索引
+```js
+function unique(arr) {
+  return arr.filter(function(item, index, arr) {
+    //当前元素，在原始数组中的第一个索引==当前索引值，否则返回当前元素
+    return arr.indexOf(item, 0) === index;
+  });
+}
+```
+* 递归
+* 利用Map数据结构，创建一个空Map数据结构，遍历需要去重的数组，把数组的每一个元素作为key存到Map中。由于Map中不会出现相同的key值，所以最终得到的就是去重后的结果
+* 利用reduce+includes
 ### 80.项目做过哪些性能优化
->减少 HTTP 请求数，减少 DNS 查询，使用 CDN，避免重定向，图片懒加载，减少 DOM 元素数量，减少DOM 操作，使用外部 JavaScript 和 CSS，压缩 JavaScript 、 CSS 、字体、图片等，优化 CSS Sprite，使用 iconfont，字体裁剪，多域名分发划分内容到不同域名，尽量减少 iframe 使用，避免图片 src 为空，把样式表放在link 中，把JavaScript放在页面底部，
-
+>减少 HTTP 请求数，减少 DNS 查询，使用 CDN，避免重定向，图片懒加载，减少 DOM 元素数量，减少DOM 操作，使用外部 JavaScript 和 CSS，压缩 JavaScript 、 CSS 、字体、图片等，优化 CSS Sprite，使用 iconfont，字体裁剪，多域名分发划分内容到不同域名，尽量减少 iframe 使用，避免图片 src 为空，把样式表放在link 中，把JavaScript放在页面底部
 ### 82 WebSocket
 >由于HTTP存在一个明显的缺陷，即消息只能从客户端推送到服务端，而使用轮询解决服务端连续变化的问题时，效率过低，因此使用WebSocket
 
