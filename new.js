@@ -3,7 +3,7 @@ function _new (fn, ...args) {
         throw new TypeError('Error')
     }
     let obj = Object.create(fn.prototype)
-    let result = fn.apply(obj.args)
+    let result = fn.apply(obj, args)
     return result instanceof Object ? result : obj
 }
 

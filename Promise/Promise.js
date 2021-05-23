@@ -1,3 +1,7 @@
+/*
+Promise.all你知道有什么特性吗？
+Promise在实例化时，就已经执行了。即Promise在创建之初，就执行了
+*/
 const PENDING = 'pending'
 const RESOLVED = 'resolved'
 const REJECTED = 'rejected'
@@ -45,8 +49,25 @@ myPromise.prototype.then = function (onFullfilled, onRejected) {
     }
 }
 
-
-
+function myPromiseAll (promiseArray) {
+    return new Promise(function (resolve, reject) {
+        if (!Array.isArray(promiseArray)) {
+            return reject(new Error('传入的参数必须是数组！'))
+        }
+        const res = []
+        let counter = 0
+        const promiseNum = promiseArray.length
+        for (let i = 0; i < promiseNum; i++) {
+            Promise.resolve(promiseArray[i]).then(value => {
+                counter++;
+                res[i] = value
+                if (counter === promiseNum) {
+                    resolve(res)
+                }
+            }).catch(err => { reject(err) })
+        }
+    })
+}
 
 
 
